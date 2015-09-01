@@ -12,6 +12,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/full_lux.mk
+# Inherit from those products. Most specific first.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
+
+# Inherit from device.mk
+$(call inherit-product, device/motorola/lux/device_lux.mk)
+
+# Device identifier. This must come after all inclusions
+PRODUCT_DEVICE := lux
+PRODUCT_NAME := full_lux
+PRODUCT_BRAND := Motorola
+PRODUCT_MANUFACTURER := Motorola
+
+$(call inherit-product-if-exists, vendor/motorola/lux/lux-vendor.mk)

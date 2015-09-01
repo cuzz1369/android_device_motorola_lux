@@ -17,68 +17,90 @@
 # Product-specific compile-time definitions.
 #
 
-ifeq ($(TARGET_ARCH),)
-TARGET_ARCH := arm
-endif
+# Architecture
+TARGET_ARCH := arm64
+TARGET_ARCH_VARIANT := armv8-a
+TARGET_CPU_ABI := arm64-v8a
+TARGET_CPU_ABI2 :=
+TARGET_CPU_VARIANT := generic
 
-BOARD_USES_GENERIC_AUDIO := true
-USE_CAMERA_STUB := true
+TARGET_2ND_ARCH := arm
+TARGET_2ND_ARCH_VARIANT := armv7-a-neon
+TARGET_2ND_CPU_ABI := armeabi-v7a
+TARGET_2ND_CPU_ABI2 := armeabi
+TARGET_2ND_CPU_VARIANT := cortex-a53
 
--include $(QCPATH)/common/msm8916_32/BoardConfigVendor.mk
-TARGET_COMPILE_WITH_MSM_KERNEL := true
-#TODO: Fix-me: Setting TARGET_HAVE_HDMI_OUT to false
-# to get rid of compilation error.
-TARGET_HAVE_HDMI_OUT := false
-TARGET_USES_OVERLAY := true
-NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
-TARGET_NO_BOOTLOADER := false
-TARGET_NO_KERNEL := false
-TARGET_NO_RADIOIMAGE := true
-TARGET_NO_RPC := true
+TARGET_BOARD_SUFFIX := _64
+TARGET_USES_64_BIT_BINDER := true
+TARGET_BOARD_PLATFORM := msm8916
+TARGET_BOARD_PLATFORM_GPU := qcom-adreno405
 
 TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
-TARGET_CPU_ABI  := armeabi-v7a
-TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_VARIANT := cortex-a53
-TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_CPU_SMP := true
+
 ARCH_ARM_HAVE_TLS_REGISTER := true
 
-TARGET_HARDWARE_3D := false
-TARGET_BOARD_PLATFORM := msm8916
-TARGET_BOOTLOADER_BOARD_NAME := msm8916
+# Bootloader
+TARGET_BOOTLOADER_BOARD_NAME := MSM8916
+TARGET_NO_BOOTLOADER := true
 
-BOARD_KERNEL_BASE        := 0x80000000
-BOARD_KERNEL_PAGESIZE    := 2048
+# Properties
+TARGET_SYSTEM_PROP += device/motorola/lux/system.prop
+
+# Kernel
+BOARD_CUSTOM_BOOTIMG_MK := device/motorola/lux/mkbootimg.mk
+BOARD_KERNEL_BASE := 0x80000000
+BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom user_debug=30 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true
 BOARD_KERNEL_TAGS_OFFSET := 0x01E00000
 BOARD_RAMDISK_OFFSET     := 0x02000000
+TARGET_KERNEL_SOURCE := kernel/motorola/msm8939
+TARGET_KERNEL_ARCH := arm64
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
+TARGET_KERNEL_HEADER_ARCH := arm64
 
-# Enables Adreno RS driver
-OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
+# Audio
+BOARD_USES_ALSA_AUDIO := true
+AUDIO_FEATURE_ENABLED_FM := true
 
-# Shader cache config options
-# Maximum size of the  GLES Shaders that can be cached for reuse.
-# Increase the size if shaders of size greater than 12KB are used.
+# Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_HAVE_BLUETOOTH_QCOM := true
+BLUETOOTH_HCI_USE_MCT := true
+
+# ANT+
+BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
+
+# Camera
+USE_CAMERA_STUB := true
+
+# CNE
+TARGET_LDPRELOAD := libNimsWrap.so
+
+# Crypto
+TARGET_HW_DISK_ENCRYPTION := true
+
+# Display
+#TODO: Fix-me: Setting TARGET_HAVE_HDMI_OUT to false
+# to get rid of compilation error.
+TARGET_HAVE_HDMI_OUT := false
+TARGET_HARDWARE_3D := false
+TARGET_USES_OVERLAY := true
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
-
-# Maximum GLES shader cache size for each app to store the compiled shader
-# binaries. Decrease the size if RAM or Flash Storage size is a limitation
-# of the device.
 MAX_EGL_CACHE_SIZE := 2048*1024
+NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
+OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
+TARGET_CONTINUOUS_SPLASH_ENABLED := true
+TARGET_USES_C2D_COMPOSITION := true
+TARGET_USES_ION := true
+TARGET_USES_NEW_ION_API :=true
+USE_OPENGL_RENDERER := true
 
-# Use signed boot and recovery image
-#TARGET_BOOTIMG_SIGNED := true
-
+# Filesystem
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
-
-BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom user_debug=30 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1
-BOARD_KERNEL_SEPARATED_DT := true
-
-BOARD_EGL_CFG := device/qcom/msm8916_32/egl.cfg
-
 BOARD_BOOTIMAGE_PARTITION_SIZE := 0x01000000
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 0x01000000
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1288491008
@@ -87,32 +109,69 @@ BOARD_CACHEIMAGE_PARTITION_SIZE := 268435456
 BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
 
+# FM
+TARGET_QCOM_NO_FM_FIRMWARE := true
+AUDIO_FEATURE_ENABLED_FM := true
 
-# Add NON-HLOS files for ota upgrade
-ADD_RADIO_FILES ?= false
+# Fonts
+EXTENDED_FONT_FOOTPRINT := true
 
-# Added to indicate that protobuf-c is supported in this build
-PROTOBUF_SUPPORTED := true
+# GPS
+TARGET_NO_RPC := true
+TARGET_GPS_HAL_PATH := device/motorola/luxgps
+TARGET_PROVIDES_GPS_LOC_API := true
 
-
-TARGET_USES_ION := true
-TARGET_USES_NEW_ION_API :=true
-TARGET_USES_QCOM_BSP := true
-
-TARGET_RECOVERY_UPDATER_LIBS := librecovery_updater_msm
+# Init
 TARGET_INIT_VENDOR_LIB := libinit_msm
 TARGET_PLATFORM_DEVICE_BASE := /devices/soc.0/
 
-#Add support for firmare upgrade on 8916
-HAVE_SYNAPTICS_I2C_RMI4_FW_UPGRADE := true
-
-#add suffix variable to uniquely identify the board
-TARGET_BOARD_SUFFIX := _32
-
-#Use dlmalloc instead of jemalloc for mallocs
+# Malloc
 MALLOC_IMPL := dlmalloc
 
-TARGET_LDPRELOAD := libNimsWrap.so
+# Motorola
+TARGET_USES_MOTOROLA_LOG := true
 
-#Enable HW based full disk encryption
-TARGET_HW_DISK_ENCRYPTION := true
+# Power
+TARGET_POWERHAL_VARIANT := qcom
+
+# Qualcomm support
+BOARD_USES_QC_TIME_SERVICES := true
+ifneq ($(QCPATH),)
+BOARD_USES_QCNE := true
+endif
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_USES_QCOM_BSP := true
+
+# Recovery
+TARGET_RECOVERY_FSTAB := ramdisk/fstab.qcom
+TARGET_RECOVERY_UPDATER_LIBS := librecovery_updater_msm
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2fS := true
+
+# Releasetools
+TARGET_RELEASETOOLS_EXTENSIONS := device/motorola/lux
+
+# RIL
+PROTOBUF_SUPPORTED := true
+TARGET_RIL_VARIANT := caf
+
+# SELinux
+include device/qcom/sepolicy/sepolicy.mk
+
+# Synaptics
+HAVE_SYNAPTICS_I2C_RMI4_FW_UPGRADE := true
+
+# Vold
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+
+# Wifi - Classic prima with driver in-built
+BOARD_HAS_QCOM_WLAN := true
+BOARD_HAS_QCOM_WLAN_SDK := true
+BOARD_HOSTAPD_DRIVER := NL80211
+BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_qcwcn
+BOARD_WLAN_DEVICE := qcwcn
+BOARD_WPA_SUPPLICANT_DRIVER := NL80211
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_qcwcn
+WIFI_DRIVER_FW_PATH_AP := "ap"
+WIFI_DRIVER_FW_PATH_STA := "sta"
+WPA_SUPPLICANT_VERSION := VER_0_8_X

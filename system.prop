@@ -1,5 +1,5 @@
 #
-# system.prop for msm8916
+# system.prop for msm8939
 #
 
 #rild.libpath=/system/lib/libreference-ril.so
@@ -160,3 +160,9 @@ ro.sys.fw.trim_enable_memory=1073741824
 ro.sys.fw.bservice_enable=true
 ro.sys.fw.bservice_limit=5
 ro.sys.fw.bservice_age=5000
+
+ro.vendor.extension_library=libqti-perfd-client.so
+persist.radio.apm_sim_not_pwdn=1
+persist.radio.sib16_support=1
+ro.frp.pst=/dev/block/bootdevice/by-name/config
+
