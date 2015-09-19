@@ -151,7 +151,7 @@
     <bool translatable="false" name="config_hotswapCapable">true</bool>
 
     <!-- Default interface to monitor data use -->
-    <string translatable="false" translatable="false" name="config_datause_iface">rmnet0</string>
+    <string translatable="false" name="config_datause_iface">rmnet0</string>
 	
     <!-- Boolean indicating if restoring network selection should be skipped -->
     <!-- The restoring is handled by modem if it is true-->
@@ -270,7 +270,7 @@
     <!-- Array of ConnectivityManager.TYPE_xxxx values allowable for tethering -->
     <!-- Common options are [1, 4] for TYPE_WIFI and TYPE_MOBILE_DUN or
     <!== [0,1,5,7] for TYPE_MOBILE, TYPE_WIFI, TYPE_MOBILE_HIPRI and TYPE_BLUETOOTH -->
-    <integer-array translatable="false" translatable="false" name="config_tether_upstream_types">
+    <integer-array translatable="false" name="config_tether_upstream_types">
         <item>0</item>
         <item>1</item>
         <item>4</item>
@@ -292,24 +292,24 @@
     <bool translatable="false" name="config_bluetooth_le_peripheral_mode_supported">true</bool>
 
     <!-- Boolean indicating whether the wifi chipset has dual frequency band support -->
-    <bool translatable="false" translatable="false" name="config_wifi_dual_band_support">false</bool>
+    <bool translatable="false" name="config_wifi_dual_band_support">false</bool>
 
     <!-- Boolean indicating whether the wifi chipset has background scan support -->
-    <bool translatable="false" translatable="false" name="config_wifi_background_scan_support">true</bool>
+    <bool translatable="false" name="config_wifi_background_scan_support">true</bool>
 
     <!-- Package name providing network location support. Used only when
 		config_enableNetworkLocationOverlay is false. -->
-    <string translatable="false" translatable="false" name="config_networkLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_networkLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
 
     <!-- Package name providing fused location support. Used only when
          config_enableFusedLocationOverlay is false. -->
-    <string translatable="false" translatable="false" name="config_fusedLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_fusedLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
 
     <!-- Component name of the geofence services provider. -->
-    <string translatable="false" translatable="false" name="config_geofenceServicesProvider" translatable="false">com.motorola.motgeofencesvc</string>
+    <string translatable="false" name="config_geofenceServicesProvider" translatable="false">com.motorola.motgeofencesvc</string>
 
     <!-- Component name of the combo network location provider. -->
-    <string translatable="false" translatable="false" name="config_comboNetworkLocationProvider" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_comboNetworkLocationProvider" translatable="false">com.qualcomm.location</string>
 
 
     <!-- Screen brightness used to dim the screen while dozing in a very low power state.
@@ -325,7 +325,7 @@
          Specify the component name or an empty string if none.
          Note that doze dreams are not subject to the same start conditions as ordinary dreams.
          Doze dreams will run whenever the power manager is in a dozing state. -->
-    <string translatable="false" translatable="false" name="config_dozeComponent">com.android.systemui/com.android.systemui.doze.DozeService</string>
+    <string translatable="false" name="config_dozeComponent">com.android.systemui/com.android.systemui.doze.DozeService</string>
 
     <!-- If true, the doze component is not started until after the screen has been
           turned off and the screen off animation has been performed. -->
@@ -375,7 +375,7 @@
     <bool translatable="false" name="config_wifiDisplaySupportsProtectedBuffers">true</bool>
 
     <!-- Wifi driver supports batched scan -->
-    <bool translatable="false" translatable="false" name="config_wifi_batched_scan_supported">true</bool>
+    <bool translatable="false" name="config_wifi_batched_scan_supported">true</bool>
 
     <!-- We dont have different firmware for wifi modes, prevent reloading it -->
     <bool translatable="false" name="config_wifiApFirmwareReload">false</bool>
@@ -384,8 +384,8 @@
     <bool translatable="false" name="config_ui_enableFadingMarquee">false</bool>
 
     <!-- Performance profiles -->
-    <string translatable="false" translatable="false" name="config_perf_profile_prop">powerhal</string>
-    <string translatable="false" translatable="false" name="config_perf_profile_default_entry">1</string>
+    <string translatable="false" name="config_perf_profile_prop">powerhal</string>
+    <string translatable="false" name="config_perf_profile_default_entry">1</string>
 
     <!-- Configuration to restart radio upon PDP_DEACTIVATE with
          error cause as Regular deactivation(36). -->
