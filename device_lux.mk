@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-DEVICE_PACKAGE_OVERLAYS += device/motorol/lux/overlay
+DEVICE_PACKAGE_OVERLAYS += device/motorola/lux/overlay
 
 # Ramdisk
 PRODUCT_COPY_FILES += \
@@ -259,18 +259,15 @@ PRODUCT_PACKAGES += \
 
 # USB - Full MTP for now
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=adb
+    persist.sys.usb.config=mtp
 
 PRODUCT_PACKAGES += \
     com.android.future.usb.accessory
 
 # WCNSS Files
 PRODUCT_COPY_FILES += \
-    device/motorol/lux/wifi/WCNSS_qcom_cfg.ini:system/etc/wifi/WCNSS_qcom_cfg.ini \
-    device/motorol/lux/wifi/WCNSS_qcom_cfg.ini:system/etc/firmware/wlan/prima/WCNSS_qcom_cfg.ini \
-    device/motorol/lux/wifi/WCNSS_qcom_wlan_nv.bin:persist/WCNSS_qcom_wlan_nv.bin \
-    device/motorol/lux/wifi/WCNSS_qcom_wlan_nv.bin:system/etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin \
-    device/motorol/lux/wifi/WCNSS_wlan_dictionary.dat:persist/WCNSS_wlan_dictionary.dat \
+    device/motorola/lux/prebuilt/system/etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin:persist/WCNSS_qcom_wlan_nv.bin \
+    device/motorola/lux/prebuilt/system/etc/firmware/wlan/prima/WCNSS_wlan_dictionary.dat:persist/WCNSS_wlan_dictionary.dat \
     kernel/motorola/msm8939/drivers/net/wireless/prima/firmware_bin/WCNSS_cfg.dat:system/etc/firmware/wlan/prima/WCNSS_cfg.dat
 
 PRODUCT_PACKAGES += \

@@ -15,5 +15,5 @@
 #
 
 ifneq ($(filter lux,$(TARGET_DEVICE)),)
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(call all-makefiles-under,device/motorola/lux)
 endif

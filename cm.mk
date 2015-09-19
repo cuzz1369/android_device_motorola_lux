@@ -17,6 +17,8 @@ $(call inherit-product, device/motorola/lux/full_lux.mk)
 # Inherit some common CM stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
+# Enhanced NFC
+$(call inherit-product, vendor/cm/config/nfc_enhanced.mk)
 
 ## Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := lux
