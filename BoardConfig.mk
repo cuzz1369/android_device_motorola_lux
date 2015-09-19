@@ -190,27 +190,25 @@ BOARD_SEPOLICY_DIRS += \
     device/motorola/lux/sepolicy
 
 BOARD_SEPOLICY_UNION += \
-    akmd09912.te \
+    akmd.te \
     atfwd.te \
     atvc.te \
     batt_health.te \
     bluetooth_loader.te \
     device.te \
-    file.te \
     file_contexts \
+    file.te \
     healthd.te \
-    init.te \
     init_shell.te \
+    init.te \
     mm-qcamerad.te \
-    property.te \
     property_contexts \
-    qseecomd.te \
+    property.te \
     rild.te \
     rmt_storage.te \
     stml0xx.te \
     surfaceflinger.te \
     system_server.te \
-    tee.te \
     ueventd.te \
     vold.te \
     wcnss_service.te

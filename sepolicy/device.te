@@ -1,0 +1,7 @@
+# Partitions
+type cid_block_device, dev_type;
+type clogo_block_device, dev_type;
+type bllogs_block_device, dev_type;
+type modem_hob_block_device, dev_type;
+type utags_block_device, dev_type;
+type kpan_block_device, dev_type;

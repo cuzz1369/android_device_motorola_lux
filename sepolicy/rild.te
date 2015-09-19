@@ -1,0 +1,6 @@
+allow rild fsg_file:dir search;
+allow rild fsg_file:file r_file_perms;
+allow rild system_data_file:sock_file { create unlink setattr };
+
+#============= shell ==============
+allow shell rild_exec:file getattr;
