@@ -95,7 +95,6 @@ etc/firmware/venus.b04
 etc/firmware/venus.mbn
 etc/firmware/venus.mdt
 etc/firmware/vrgain.bin
-etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
 etc/flp.conf
 etc/gps.conf
 etc/hcidump.sh
