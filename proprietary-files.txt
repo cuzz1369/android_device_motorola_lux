@@ -119,8 +119,6 @@ etc/lowi.conf
 etc/permissions/com.qualcomm.location.xml
 etc/permissions/qcnvitems.xml
 etc/permissions/qcrilhook.xml
-etc/pp_calib_data_mipi_mot_cmd_tdi_1080p_546_v0.xml
-etc/pp_calib_data_mipi_mot_cmd_tdi_1080p_546_v1.xml
 etc/qca6234-service.sh
 etc/quipc.conf
 etc/sap.conf
