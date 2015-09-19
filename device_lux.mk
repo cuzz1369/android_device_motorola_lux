@@ -282,3 +282,8 @@ PRODUCT_PACKAGES += \
     hostapd \
     wpa_supplicant \
     wcnss_service
+
+PRODUCT_PACKAGES += \
+    p2p_supplicant_overlay.conf \
+    wpa_supplicant_overlay.conf \
+    hostapd_default.conf
