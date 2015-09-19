@@ -65,6 +65,7 @@ TARGET_USES_QCOM_MM_AUDIO := true
 
 # Asserts
 TARGET_OTA_ASSERT_DEVICE := lux,xt1563,xt1562
+WITH_LZMA_OTA := true
 
 # Bluetooth
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/motorola/lux/bluetooth
