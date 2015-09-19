@@ -18,7 +18,7 @@ persist.radio.rat_on=combine
 ril.subscription.types=NV,RUIM
 DEVICE_PROVISIONED=1
 # Start in cdma mode
-ro.telephony.default_network=5
+ro.telephony.default_network=9
 
 debug.sf.hw=1
 debug.egl.hw=1
@@ -42,12 +42,18 @@ debug.cpurend.vsync=false
 #
 # system props for the cne module
 #
-persist.cne.feature=1
+persist.cne.feature=0
+
 
 #
 # system props for the dpm module
 #
 persist.dpm.feature=3
+
+#
+# system props for the iwlan module
+#
+persist.data.iwlan.enable=false
 
 #system props for the MM modules
 media.stagefright.enable-player=true
@@ -83,12 +89,13 @@ persist.timed.enable=true
 ro.opengles.version=196608
 
 # System property for cabl
-ro.qualcomm.cabl=2
+ro.qualcomm.cabl=0
 
 #
 # System props for telephony
 # System prop to turn on CdmaLTEPhone always
-telephony.lteOnCdmaDevice=1
+# Motorola default to 0
+telephony.lteOnCdmaDevice=0
 #
 # System props for bluetooh
 # System prop to turn on hfp client
@@ -103,20 +110,25 @@ persist.fuse_sdcard=true
 #
 ro.qc.sdk.audio.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
-ro.qc.sdk.audio.fluencetype=none
+ro.qc.sdk.audio.fluencetype=fluence
 persist.audio.fluence.voicecall=true
 persist.audio.fluence.voicerec=false
-persist.audio.fluence.speaker=true
-#Set for msm8916
-tunnel.audio.encode = false
+persist.audio.fluence.audiorec=false
+persist.audio.fluence.speaker=false
+persist.audio.fluence.mode=endfire
+ro.config.vc_call_vol_steps=7
+# Tone generator maximum volume be between 0 and 100 (0dB)
+ro.audio.ringbeep_volume=73
 #Buffer size in kbytes for compress offload playback
-audio.offload.buffer.size.kb=64
+audio.offload.buffer.size.kb=240
 #Minimum duration for offload playback in secs
 audio.offload.min.duration.secs=30
+# Motorola enable offload audio playback
+audio.offload.disable=0
 #Enable offload audio video playback by default
 av.offload.enable=true
 #enable voice path for PCM VoIP by default
-use.voice.path.for.pcm.voip=true
+use.voice.path.for.pcm.voip=false
 #
 #System property for FM transmitter
 #
@@ -129,16 +141,10 @@ voice.playback.conc.disabled=true
 voice.record.conc.disabled=true
 voice.voip.conc.disabled=true
 
-#Set composition for USB
-persist.sys.usb.config=diag,serial_smd,rmnet_bam,adb
-
-#Set read only default composition for USB
-ro.sys.usb.default.config=diag,serial_smd,rmnet_bam,adb
-
 #property to enable user to access Google WFD settings
-persist.debug.wfd.enable=1
+persist.debug.wfd.enable=0
 #propery to enable VDS WFD solution
-persist.hwc.enable_vds=1
+persist.hwc.enable_vds=0
 
 #selects CoreSight configuration to enable
 persist.debug.coresight.config=stm-events
@@ -165,4 +171,89 @@ ro.vendor.extension_library=libqti-perfd-client.so
 persist.radio.apm_sim_not_pwdn=1
 persist.radio.sib16_support=1
 ro.frp.pst=/dev/block/bootdevice/by-name/config
+
+#
+# system.prop for lux
+#
+
+# USB Props
+ro.usb.mtp=2e82
+ro.usb.mtp_adb=2e76
+ro.usb.ptp=2e83
+ro.usb.ptp_adb=2e84
+ro.usb.bpt=2ec1
+ro.usb.bpt_adb=2ec5
+ro.usb.bpteth=2ec3
+ro.usb.bpteth_adb=2ec6
+
+# RIL
+persist.sys.ssr.restart_level=ALL_ENABLE
+persist.sys.qc.sub.rdump.on=1
+persist.sys.qc.sub.rdump.max=3
+persist.data.qmi.adb_logmask=0
+persist.radio.no_wait_for_card=1
+persist.radio.relay_oprt_change=1
+persist.radio.dfr_mode_set=1
+persist.qcril_uim_vcc_feature=1
+persist.radio.msgtunnel.start=true
+persist.radio.oem_ind_to_both=false
+ro.data.large_tcp_window_size=true
+persist.radio.apn_delay=5000
+keyguard.no_require_sim=true
+
+# Sdcard
+persist.fuse_sdcard=false
+persist.esdfs_sdcard=true
+ro.crypto.fuse_sdcard=true
+
+# GPS
+persist.mot.gps.conf.from.sim=true
+persist.mot.gps.smart_battery=1
+persist.gps.qc_nlp_in_use=0
+ro.gps.agps_provider=1
+ro.pip.gated=0
+
+# CPU
+ro.cpu0.cpu_max_freq=10485760
+ro.cpu4.cpu_max_freq=10485760
+
+# Bluetooth
+qcom.bt.le_dev_pwr_class=1
+ro.bluetooth.hfp.ver=1.6
+ro.qualcomm.bt.hci_transport=smd
+
+# HWUI
+ro.hwui.texture_cache_size=72
+ro.hwui.layer_cache_size=48
+ro.hwui.r_buffer_cache_size=8
+ro.hwui.path_cache_size=32
+ro.hwui.gradient_cache_size=1
+ro.hwui.drop_shadow_cache_size=6
+ro.hwui.texture_cache_flushrate=0.4
+ro.hwui.text_small_cache_width=1024
+ro.hwui.text_small_cache_height=1024
+ro.hwui.text_large_cache_width=2048
+ro.hwui.text_large_cache_height=1024
+
+# Audio
+persist.audio.calfile0=/etc/acdbdata/Bluetooth_cal.acdb
+persist.audio.calfile1=/etc/acdbdata/General_cal.acdb
+persist.audio.calfile2=/etc/acdbdata/Global_cal.acdb
+persist.audio.calfile3=/etc/acdbdata/Handset_cal.acdb
+persist.audio.calfile4=/etc/acdbdata/Hdmi_cal.acdb
+persist.audio.calfile5=/etc/acdbdata/Headset_cal.acdb
+persist.audio.calfile6=/etc/acdbdata/Speaker_cal.acdb
+ro.audio.fm_max_volume=7301
+persist.sys.media.use-awesome=false
+audio.offload.disable=0
+audio.offload.pcm.16bit.enable=false
+audio.offload.pcm.24bit.enable=false
+audio.offload.gapless.enabled=false
+av.offload.enable=false
+mm.enable.qcom_parser=4643
+drm.service.enabled=true
+
+# Misc
+mdc_initial_max_retry=10
+ro.partial.display=false
 

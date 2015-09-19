@@ -53,6 +53,17 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml
 
+# Screen density
+PRODUCT_AAPT_CONFIG := normal hdpi xhdpi xxhdpi
+PRODUCT_AAPT_PREF_CONFIG := xxhdpi
+
+# Boot animation
+TARGET_SCREEN_HEIGHT := 1920
+TARGET_SCREEN_WIDTH := 1080
+
+$(call inherit-product, frameworks/native/build/phone-xxhdpi-2048-dalvik-heap.mk)
+$(call inherit-product, frameworks/native/build/phone-xxhdpi-2048-hwui-memory.mk)
+
 # Add QC Enhancements flag
 TARGET_ENABLE_QC_AV_ENHANCEMENTS += true
 TARGET_USES_QCOM_BSP += true
@@ -134,6 +145,9 @@ PRODUCT_PACKAGES += \
     hwcomposer.msm8916 \
     liboverlay
 
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sf.lcd_density=480
+
 # Filesystem
 PRODUCT_PACKAGES += \
     e2fsck \
@@ -213,27 +227,16 @@ PRODUCT_PACKAGES += \
     iptables
 
 # NFC packages
-ifeq ($(TARGET_USES_QCA_NFC),true)
-NFC_D += true
-
-ifeq ($(NFC_D), true)
-    PRODUCT_PACKAGES += \
-        libnfcD-nci \
-        libnfcD_nci_jni \
-        nfc_nci.msm8916 \
-        NfcDNci \
-        Tag \
-        com.android.nfc_extras \
-        com.android.nfc.helper
-else
-    PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES += \
+    libnfc \
+    libnfc_jni \
+    nfc_nci.bcm2079x.msm8916 \
+    libnfc_ndef \
     libnfc-nci \
     libnfc_nci_jni \
-    nfc_nci.msm8916 \
     NfcNci \
     Tag \
     com.android.nfc_extras
-endif
 
 # OEM Services library
 PRODUCT_PACKAGES += \
@@ -251,6 +254,7 @@ PRODUCT_PACKAGES += ramdisk/fstab.qcom
 
 # RIL
 PRODUCT_PACKAGES += \
+    libbson \
     libxml2
 
 # USB - Full MTP for now

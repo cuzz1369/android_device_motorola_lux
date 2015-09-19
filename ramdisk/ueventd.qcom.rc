@@ -27,6 +27,9 @@
 
 # the DIAG device node is not world writable/readable.
 /dev/diag                 0660   system     qcom_diag
+/dev/ttydiag0             0660   system     qcom_diag
+/dev/ttydiag1             0660   system     qcom_diag
+/dev/ttydiag2             0660   system     qcom_diag
 
 /dev/genlock              0666   system     system
 /dev/kgsl                 0666   system     system
@@ -34,7 +37,7 @@
 /dev/kgsl-2d0             0666   root       root
 /dev/kgsl-2d1             0666   root       root
 /dev/ion                  0664   system     system
-/dev/rtc0                 0600   system     system
+/dev/rtc0                 0660   system     system
 /dev/smd0                 0660   system     system
 /dev/smd4                 0660   system     system
 /dev/smd_cxm_qmi          0640   radio      radio
@@ -45,6 +48,8 @@
 /dev/ipa                  0660   net_admin  net_admin
 /dev/wwan_ioctl           0660   net_admin  net_admin
 /dev/ipaNatTable          0660   net_admin  net_admin
+
+/dev/block/bootdevice/by-name/frp 0600 system system
 
 #permissions for CSVT
 /dev/smd11                0660   radio      radio
@@ -104,7 +109,8 @@
 /dev/video*               0660   system     camera
 /dev/media*               0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
-/dev/qseecom              0660   system     drmrpc
+/dev/qseecom              0660   system     mot_tpapi
+/dev/sec                  0660   system     mot_tpapi
 /dev/pft                  0660   system     drmrpc
 /dev/gemini0              0660   system     camera
 /dev/jpeg0                0660   system     camera
@@ -203,6 +209,7 @@
 #nfc permissions
 /dev/nfc-nci              0660    nfc         nfc
 /dev/assd                 0660    nfc         nfc
+/dev/bcm2079x-i2c         0660    nfc         nfc
 
 # UIO devices
 /dev/uio0                 0660   system     system
@@ -220,3 +227,25 @@
 
 # Add device block for FRP
 /dev/block/bootdevice/by-name/config    0660   system     system
+
+# Moto Sensors
+/dev/stml0xx               0660  system     compass
+/dev/stml0xx_as            0660  compass    compass
+/dev/stml0xx_ms            0660  compass    compass
+/dev/akm09912              0660  compass    compass
+/dev/akm09912_dev          0660  compass    compass
+
+#DTV
+/dev/isdbt                0660  mot_dtv     mot_dtv
+
+# Permissions for tcmd
+/dev/i2c-*                0660   root       system
+
+# HOB
+/dev/mot_hob_ram          0660   radio      radio
+
+# Subsystem Restart Ramdump
+/dev/ramdump*             0660   radio      radio
+
+# haptic
+/dev/drv2605              0660   system     system
