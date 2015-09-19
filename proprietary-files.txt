@@ -479,7 +479,6 @@ vendor/lib/libmmcamera_ov8858_q8v19w.so
 vendor/lib/libmmcamera_ov8865_q8v18a.so
 vendor/lib/libmmcamera_ov9724.so
 vendor/lib/libmmcamera_s5k3l1yx.so
-vendor/lib/libmmcamera_s5k3m2.so
 vendor/lib/libmmcamera_s5k5e2.so
 vendor/lib/libmmcamera_skuab_shinetech_gc0339.so
 vendor/lib/libmmcamera_skuf_ov12830_p12v01c.so
