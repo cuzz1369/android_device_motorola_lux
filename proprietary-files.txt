@@ -1,6 +1,6 @@
 -app/MotGeoFenceSvc/MotGeoFenceSvc.apk
 -app/TimeService/TimeService.apk
--app/com.qualcomm.location/com.qualcomm.location.apk
+-priv-app/com.qualcomm.location/com.qualcomm.location.apk
 -app/qcrilmsgtunnel/qcrilmsgtunnel.apk
 -framework/qcnvitems.jar
 -framework/qcrilhook.jar
@@ -95,9 +95,6 @@ etc/firmware/venus.b04
 etc/firmware/venus.mbn
 etc/firmware/venus.mdt
 etc/firmware/vrgain.bin
-etc/firmware/wcd9306
-etc/firmware/wcd9306/wcd9306_anc.bin
-etc/firmware/wcd9306/wcd9306_mbhc.bin
 etc/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
 etc/flp.conf
 etc/gps.conf
@@ -464,7 +461,6 @@ vendor/lib/libmmcamera_hdr_lib.so
 vendor/lib/libmmcamera_hi256.so
 vendor/lib/libmmcamera_imglib.so
 vendor/lib/libmmcamera_imx132.so
-vendor/lib/libmmcamera_imx214.so
 vendor/lib/libmmcamera_imx230.so
 vendor/lib/libmmcamera_mt9m114.so
 vendor/lib/libmmcamera_mt9v113.so
