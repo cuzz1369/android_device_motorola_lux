@@ -187,11 +187,13 @@ BOARD_SEPOLICY_UNION += \
     mm-qcamerad.te \
     property_contexts \
     property.te \
+    qseecomd.te \
     rild.te \
     rmt_storage.te \
     stml0xx.te \
     surfaceflinger.te \
     system_server.te \
+    tee.te \
     ueventd.te \
     vold.te \
     wcnss_service.te
