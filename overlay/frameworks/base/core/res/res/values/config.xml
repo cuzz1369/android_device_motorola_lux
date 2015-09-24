@@ -306,7 +306,8 @@
     <string translatable="false" name="config_fusedLocationProviderPackageName">com.qualcomm.location</string>
 
     <!-- Component name of the geofence services provider. -->
-    <string translatable="false" name="config_geofenceServicesProvider">com.motorola.motgeofencesvc</string>
+    <!-- Disabled for now -->
+    <!-- <string translatable="false" name="config_geofenceServicesProvider">com.motorola.motgeofencesvc</string> -->
 
     <!-- Component name of the combo network location provider. -->
     <string translatable="false" name="config_comboNetworkLocationProvider">com.qualcomm.location</string>
