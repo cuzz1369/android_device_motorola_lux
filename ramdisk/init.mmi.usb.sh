@@ -36,6 +36,21 @@ usb_action=`getprop usb.mmi-usb-sh.action`
 echo "mmi-usb-sh: action = \"$usb_action\""
 sys_usb_config=`getprop sys.usb.config`
 
+# soc_ids for 8916/8939 differentiation
+if [ -f /sys/devices/soc0/soc_id ]; then
+        soc_id=`cat /sys/devices/soc0/soc_id`
+else
+        soc_id=`cat /sys/devices/system/soc/soc0/id`
+fi
+
+# enable rps cpus on msm8939 target
+setprop sys.usb.rps_mask 0
+case "$soc_id" in
+        "239" | "241" | "263")
+                setprop sys.usb.rps_mask 10
+        ;;
+esac
+
 tcmd_ctrl_adb ()
 {
     ctrl_adb=`getprop tcmd.ctrl_adb`

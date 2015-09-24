@@ -143,7 +143,7 @@
     </string-array>
 
     <!-- Do not translate. Defines the slots is Two Digit Number for dialing normally not USSD -->
-    <string-array translatable="false"  name="config_twoDigitNumberPattern" translatable="false">
+    <string-array translatable="false"  name="config_twoDigitNumberPattern">
         <item>08</item>
     </string-array>
 
@@ -299,17 +299,17 @@
 
     <!-- Package name providing network location support. Used only when
 		config_enableNetworkLocationOverlay is false. -->
-    <string translatable="false" name="config_networkLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_networkLocationProviderPackageName">com.qualcomm.location</string>
 
     <!-- Package name providing fused location support. Used only when
          config_enableFusedLocationOverlay is false. -->
-    <string translatable="false" name="config_fusedLocationProviderPackageName" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_fusedLocationProviderPackageName">com.qualcomm.location</string>
 
     <!-- Component name of the geofence services provider. -->
-    <string translatable="false" name="config_geofenceServicesProvider" translatable="false">com.motorola.motgeofencesvc</string>
+    <string translatable="false" name="config_geofenceServicesProvider">com.motorola.motgeofencesvc</string>
 
     <!-- Component name of the combo network location provider. -->
-    <string translatable="false" name="config_comboNetworkLocationProvider" translatable="false">com.qualcomm.location</string>
+    <string translatable="false" name="config_comboNetworkLocationProvider">com.qualcomm.location</string>
 
 
     <!-- Screen brightness used to dim the screen while dozing in a very low power state.
@@ -417,7 +417,7 @@
          if the sensor HAL correctly handles the proximity sensor as a wake-up source.
          Otherwise, the device may fail to wake out of suspend reliably.
          The default is false. -->
-    <bool translatable="false"name="config_suspendWhenScreenOffDueToProximity">true</bool>
+    <bool translatable="false" name="config_suspendWhenScreenOffDueToProximity">true</bool>
 
 
 </resources>

@@ -1,17 +1,9 @@
-import init.mmi.overlay.rc
-
 # Moto USB configuration
 import init.mmi.usb.rc
-import init.mmi.diag.rc
-import init.mmi.debug.rc
-import init.mmi.volte.rc
 
 on early-init
-    # Set boot up stage I/O scheduler
-    write /sys/block/mmcblk0/queue/scheduler deadline
-
-    # Create modem FSG mount point
-    mkdir /fsg 755 root root
+    # Mount point for Digital Personalization partition
+    mkdir /customize 0500 root root
 
 on init
     mount pstore pstore /sys/fs/pstore
@@ -21,14 +13,6 @@ on init
     chmod 0640 /sys/fs/pstore/annotate-ramoops
 
     copy /module_hashes /sys/kernel/module_whitelist
-
-    # Setup kernel dropbox permissions so that dropboxd can utilize it
-    chown root diag /sys/kernel/dropbox/event
-    chown root diag /sys/kernel/dropbox/data
-
-    # Configure coredump
-    write /proc/sys/kernel/core_pattern "|/system/bin/coredump %e %p %t"
-    write /proc/self/coredump_filter "0x7f"
 
     # ESDFS
     chown mot_esdfs root /proc/fs/esdfs/packages
@@ -44,18 +28,30 @@ on charger
 
 on moto-charger
     setprop ro.board.platform msm8916
-    start  qcom-post-boot
+
+    # HMP scheduler load tracking settings
+    write /proc/sys/kernel/sched_ravg_hist_size 3
+
+    # HMP Task packing settings for 8916
+    write /proc/sys/kernel/sched_small_task 50
+    write /proc/sys/kernel/sched_mostly_idle_load 50
+    write /proc/sys/kernel/sched_mostly_idle_nr_run 10
+
+    # disable thermal core_control to update scaling_min_freq
+    write /sys/module/msm_thermal/core_control/enabled 0
+    write /sys/devices/system/cpu/cpu0/online 1
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 200000
+    # enable thermal core_control now
+    write /sys/module/msm_thermal/core_control/enabled 1
+
+    # Set Battery LED behavior
+    write /sys/class/leds/charging/trigger "battery-full"
+
     start charge_only_mode
     start batt_health
     start thermal-com
     write /sys/module/lpm_levels/parameters/sleep_disabled 0
-
-on early-boot
-    # boot with max freq, will be reset in post_boot script
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq ${ro.cpu0.cpu_max_freq}
-    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq ${ro.cpu4.cpu_max_freq}
-
-    exec /system/bin/sh /init.mmi.early_boot.sh
 
 on boot
   # Change ownership and permission for backlight
@@ -64,10 +60,6 @@ on boot
     chown system system /sys/class/backlight/lcd-backlight:0/max_brightness
     chmod 0664 /sys/class/backlight/lcd-backlight:0/max_brightness
     chmod 0664 /sys/class/leds/lcd-backlight/brightness
-
-    # Change ownership and permission for vibrator
-    chown system system /sys/class/timed_output/vibrator/enable
-    chmod 0660 /sys/class/timed_output/vibrator/enable
 
     # Change the ownership of the notification LED interface
     chown system system /sys/class/leds/rgb/control
@@ -80,6 +72,8 @@ on boot
     # Change the ownership of the charging LED interface
     chown system system /sys/class/leds/charging/brightness
     chmod 0664 /sys/class/leds/charging/brightness
+    chown system system /sys/class/leds/charging/trigger
+    chmod 0664 /sys/class/leds/charging/trigger
 
     # Assign TCP buffer thresholds to be ceiling value of technology maximums
     # Increased technology maximums should be reflected here.
@@ -111,11 +105,38 @@ on boot
     # Create moodle directory that MOT_MOODLE can write to
     mkdir /data/local/moodle 0770 graphics mot_tcmd
 
-    insmod /system/lib/modules/touchx.ko
+    # AK09912 driver parameter permissions
+    chown system compass /sys/class/compass/akm09912/accel
+    chmod 0660 /sys/class/compass/akm09912/accel
+    chown system compass /sys/class/compass/akm09912/delay_acc
+    chmod 0660 /sys/class/compass/akm09912/delay_acc
+    chown system compass /sys/class/compass/akm09912/enable_acc
+    chmod 0660 /sys/class/compass/akm09912/enable_acc
+    chown system compass /sys/class/compass/akm09912/delay_fusion
+    chmod 0660 /sys/class/compass/akm09912/delay_fusion
+    chown system compass /sys/class/compass/akm09912/enable_fusion
+    chmod 0660 /sys/class/compass/akm09912/enable_fusion
+    chown system compass /sys/class/compass/akm09912/delay_mag
+    chmod 0660 /sys/class/compass/akm09912/delay_mag
+    chown system compass /sys/class/compass/akm09912/enable_mag
+    chmod 0660 /sys/class/compass/akm09912/enable_mag
 
-    setprop ro.hw.device ${ro.boot.device}
-    setprop ro.hw.hwrev ${ro.boot.hwrev}
-    setprop ro.hw.radio ${ro.boot.radio}
+    # Change the ownership of display TE files for tcmds
+    chown root mot_tcmd /sys/class/graphics/fb0/te_enable
+    chown root mot_tcmd /sys/class/graphics/fb0/frame_counter
+
+    # set permission for Dynamic-CABC feature
+    chown system system /sys/class/graphics/fb0/cabc_mode
+    # set permission for HBM feature
+    chown system system /sys/class/graphics/fb0/hbm
+
+    # Change ownership of aov related sysfs entries
+    chown audio audio /sys/kernel/aov/trigger
+    chown audio audio /sys/kernel/aov/register
+    chown audio audio /sys/kernel/aov/event
+
+    # Create directory for adspd
+    mkdir /data/adspd/ 0770 audio diag
 
 on fs
     # Mount modem FSG partition
@@ -127,6 +148,10 @@ on fs
 
     # use /persist as phony PDS partition
     symlink /persist /pds
+
+    #Mount customize partion
+    wait /dev/block/platform/msm_sdcc.1/by-name/customize
+    mount ext4 /dev/block/platform/msm_sdcc.1/by-name/customize /customize ro discard nosuid nodev noatime nodiratime noexec defcontext=u:object_r:user_config_file:s0
 
 on post-fs
     mkdir /persist/camera 0755 mot_tcmd mot_tcmd
@@ -192,13 +217,6 @@ on post-fs-data
     # Setup correct permissions for dbvc
     mkdir /data/local/dbvc 0750 mot_tcmd shell
 
-    # Setup folders for diag_mdlog
-    mkdir /data/diag_mdlog 0750 system log
-    mkdir /data/diag_mdlog/logs 0750 log log
-
-    # Setup folder for aplogd
-    mkdir /data/aplogd 0750 log log
-
     # Permissions for phone power off log
     mkdir /data/power_log 0750 root log
     chmod 0660 /sys/module/power_supply_log/parameters/log_file
@@ -210,10 +228,20 @@ on post-fs-data
     # SD card encryption metadata
     mkdir /data/misc/sds 0750 root root
 
-service mmi-block-perm /system/bin/sh /init.mmi.block_perm.sh
+    # AK09912 calibration file directory
+    mkdir /data/misc/akmd 0770 system compass
+
+# Start AKM executable
+service akmd09912 /system/bin/akmd09912
     class main
-    user root
-    oneshot
+    user compass
+    group compass misc input
+
+service adspd /system/bin/adspd
+    class main
+    socket adspdsock stream 0660 system audio
+    user audio
+    group audio input diag
 
 service batt_health /system/bin/batt_health
     class late_start
@@ -234,12 +262,6 @@ service charge_only_mode /system/bin/charge_only_mode
     group graphics system input
     disabled
 
-service ftmipcd /system/bin/ftmipcd
-    user radio
-    group radio net_raw inet qcom_diag
-    disabled
-    oneshot
-
 service atvc_core /system/bin/dbvc_atvc_property_set
     class core
     user mot_atvc
@@ -252,125 +274,25 @@ service atvc /system/bin/dbvc_atvc_property_set
     group mot_tpapi
     oneshot
 
-service qe /xbin/qe /system
-    class main
-    seclabel u:r:qe:s0
-    oneshot
-    disabled
-
-service qe_broadcast /xbin/qe /system -b
-    class main
-    seclabel u:r:qe:s0
-    oneshot
-    disabled
-
-on property:persist.qe.trigger=1
-    start qe_broadcast
-
-on property:sys.boot_completed=1
-    start qe
-    # restore the default I/O scheduler for mobile device
-    write /sys/block/mmcblk0/queue/scheduler cfq
-
 # Start Sensor daemon
-service stml0xx /system/bin/stml0xx boot
+service stml0xx /system/bin/stml0xx_wrapper.sh
     class late_start
     user compass
     group compass misc input
     oneshot
 
-on property:ro.bootmode=factory
-    start ftmipcd
-
-on property:ro.bootmode=mot-factory
-    start ftmipcd
-
-# Power up to suspend
-on property:tcmd.suspend=1
-    stop surfaceflinger
-    stop zygote
-    stop sensors
-    write /sys/kernel/factory_gsbi12_mode/install 1
-    setprop debug.sf.nobootanimation 1
-
-# Normal to suspend
-on property:tcmd.suspend=2
-    stop surfaceflinger
-    stop zygote
-    stop sensors
-    write /sys/kernel/factory_gsbi12_mode/install 1
-    setprop debug.sf.nobootanimation 1
-    stop wlan_logging
-
-on property:persist.sys.diag_mdlog.on=1
-    start diag_mdlog
-
-on property:persist.sys.diag_mdlog.on=0
-    start safe_stop_mdlog
-
-on property:log.diag_mdlog.invld_mode_stop=1
-    stop diag_mdlog
-
-on property:persist.radio.usbdiag=1
-    setprop persist.sys.diag_mdlog.on 0
-
-service diag_mdlog /system/bin/diag_mdlog-wrap
-    class main
-    socket mdlog_cmd stream 0660 log diag
-    user log
-    group log sdcard_rw sdcard_r media_rw qcom_diag mount
-    disabled
-
-service safe_stop_mdlog /system/bin/diag_mdlog-getlogs -s
-    class late_start
-    user log
-    group log sdcard_rw sdcard_r media_rw qcom_diag mount
-    oneshot
-    disabled
-
-service tcmd /system/bin/tcmd
-    class core
-#  Total number of supplementary groups below is 31 now. Limit defined in init.h is 32.
-#  Please update the current number if you add more groups.
-    group mot_tcmd radio mot_pwric input system log camera graphics mot_accy sdcard_r sdcard_rw audio inet bluetooth wifi compass net_bt_admin mot_tombstone mot_tpapi mount net_raw net_admin media shell mot_usb nfc qcom_diag mot_dbvc cache media_rw mot_dtv
-    socket local_tcmd stream 0660 mot_tcmd mot_tcmd
-    socket batch_socket stream 0600 mot_tcmd mot_tcmd
-    oneshot
-    disabled
-
-service tcmdhelp /system/bin/tcmdhelp
-    class main
-    socket tcmdhelp stream 0600 mot_tcmd mot_tcmd
-    oneshot
-    disabled
-
-on property:tcmd.start_tcmdhelp=1
-    start tcmdhelp
-
-on property:tcmd.start_ftmdaemon=1
-    start ftmd
-
-on property:persist.mot.demo_mode_charging=1
-    write /sys/class/power_supply/battery/device/force_demo_mode 1
-
-on property:persist.log.aplogd.enable=1
-    start aplogd
-
-on property:persist.log.aplogd.enable=0
-    stop aplogd
-
-service aplogd /system/bin/aplogd
-    class main
-    #user log
-    #group log system sdcard_rw sdcard_r media_rw mount
-    # The user and group definitions above are intentionally disabled and left
-    # only as documentation. It actually starts as root and immediately drops
-    # to log plus those groups after preserving CAP_SYS_ADMIN, which is required
-    # for kernel logging.
-    disabled
-
 service mmi-boot-sh /system/bin/sh /init.mmi.boot.sh
     class core
+    user root
+    oneshot
+
+service mmi-block-perm /system/bin/sh /init.mmi.block_perm.sh
+    class main
+    user root
+    oneshot
+
+service mmi-early_boot-sh /system/bin/sh /init.mmi.early_boot.sh
+    class late_start
     user root
     oneshot
 
@@ -404,36 +326,6 @@ service hw_revs /system/bin/sh /system/bin/hardware_revisions.sh
     group system
     oneshot
 
-service mbm_spy /system/bin/mbm_spy
-    class late_start
-    user system
-    group system
-    oneshot
-
-service dropboxd /system/bin/dropboxd
-    class late_start
-    user diag
-    group diag
-
-service ss_rdump /system/bin/subsystem_ramdump 1 0
-   class late_start
-   user radio
-   group log sdcard_rw sdcard_r diag
-
-on property:persist.sys.qc.sub.rdump.on=1
-   write /sys/module/subsystem_restart/parameters/enable_ramdumps ${persist.sys.qc.sub.rdump.on}
-
-service esdpll /system/bin/esdpll -w
-    user mot_esdfs
-    group mot_esdfs package_info
-    disabled
-
-on property:ro.esdfs_sdcard=true
-    wait /data/media/0 600
-    mount esdfs /data/media /mnt/shell/emulated derive=legacy
-    mount none /mnt/shell/emulated/0 /storage/emulated/legacy bind
-    start esdpll
-
 on property:ro.fuse_sdcard=true
     start sdcard
 
@@ -462,23 +354,8 @@ service thermal-com /system/bin/thermal-engine --minimode
     user root
     disabled
 
-service emmc_ffu /system/bin/sh /system/bin/emmc_ffu.sh
-    user root
-    class core
-    oneshot
-    disabled
-
-on property:sys.emmc.ffu_start=1
-    start emmc_ffu
-
-on property:sys.boot_completed=1
-    start emmc_ffu
-
-service emmc_ffu_check /system/bin/sh /system/bin/emmc_ffu.sh -c
-    user root
-    class core
-    oneshot
-    disabled
-
-on property:ro.bootmode=mot-factory
-    start emmc_ffu_check
+on property:sys.wifi.tethering=true
+    write /sys/class/net/wlan0/queues/rx-0/rps_cpus ${sys.usb.rps_mask}
+    write /sys/class/net/wlan0/queues/rx-1/rps_cpus ${sys.usb.rps_mask}
+    write /sys/class/net/wlan0/queues/rx-2/rps_cpus ${sys.usb.rps_mask}
+    write /sys/class/net/wlan0/queues/rx-3/rps_cpus ${sys.usb.rps_mask}

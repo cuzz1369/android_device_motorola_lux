@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2012, 2014-2015, The Linux Foundation. All rights reserved.
+# Copyright (c) 2009-2012, 2014, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -27,11 +27,30 @@
 
 # use init.mmi.usb.rc
 #import init.qcom.usb.rc
-import init.target.rc
+import init.mmi.rc
 
 on early-init
+
+    write /sys/block/mmcblk0/queue/scheduler noop
+
     mount debugfs debugfs /sys/kernel/debug
     chown system graphics /sys/devices/virtual/graphics/fb0/idle_time
+
+    mkdir /system 0777 root root
+
+    # Create firmware mount point
+    mkdir /firmware 0771 system system
+
+    # Create PDS mount point
+    mkdir /pds 0755 root root
+
+    # Create modem FSG mount point
+    mkdir /fsg 755 root root
+
+    chown system system /sys/kernel/debug
+    chmod 0775 /sys/kernel/debug
+
+    symlink /data/tombstones /tombstones
 
 on init
     # Set permissions for persist partition
@@ -39,7 +58,6 @@ on init
     # See storage config details at http://source.android.com/tech/storage/
     mkdir /mnt/shell/emulated 0700 shell shell
     mkdir /storage/emulated 0555 root root
-    mkdir /storage/emulated/legacy 0555 root root
     mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
     mkdir /mnt/media_rw/usbotg 0700 media_rw media_rw
     mkdir /storage/sdcard1 0700 root root
@@ -55,15 +73,46 @@ on init
     symlink /storage/emulated/legacy /sdcard
     symlink /storage/emulated/legacy /mnt/sdcard
     symlink /storage/emulated/legacy /storage/sdcard0
+    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
+    symlink /storage/sdcard1 /mnt/sdcard1
+    symlink /storage/sdcard1 /external_sd
+
+    # Configure coredump
+    write /proc/sys/kernel/core_pattern "|/system/bin/coredump %e %p %t"
+    write /proc/self/coredump_filter "0x7f"
+
+    # Setup kernel dropbox permissions so that dropboxd can utilize it
+    chown root diag /sys/kernel/dropbox/event
+    chown root diag /sys/kernel/dropbox/data
+
+on fs
+    mount_all fstab.qcom
+    write /sys/kernel/boot_adsp/boot 1
+
+    # Set correct permissions for HOB, DHOB
+    exec /system/bin/chmod -L 660 /dev/block/platform/soc.0/by-name/hob
+    exec /system/bin/chmod -L 660 /dev/block/platform/soc.0/by-name/dhob
+    exec /system/bin/chmod -L 660 /dev/block/platform/soc.0/by-name/clogo
+    exec /system/bin/chown -L root:radio /dev/block/platform/soc.0/by-name/hob
+    exec /system/bin/chown -L root:radio /dev/block/platform/soc.0/by-name/dhob
+    exec /system/bin/chown -L root:mot_tcmd /dev/block/platform/soc.0/by-name/clogo
+
+    # Set correct permissions for CID
+    exec /system/bin/chmod -L 660 /dev/block/platform/soc.0/by-name/cid
+    exec /system/bin/chown -L root:mot_dbvc /dev/block/platform/soc.0/by-name/cid
+
+    # Set permissions for BL logs
+    exec /system/bin/chmod -L 640 /dev/block/platform/soc.0/by-name/logs
+    exec /system/bin/chown -L root:system /dev/block/platform/soc.0/by-name/logs
+
+    mkdir /persist/data 0700  system system
+    restorecon_recursive /persist
+
+    setprop ro.crypto.fuse_sdcard true
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
-    # Allow subsystem (modem etc) debugging
-    write /sys/module/subsystem_restart/parameters/enable_debug ${persist.sys.ssr.enable_debug}
-    write /sys/module/pil_msa/parameters/pbl_mba_boot_timeout_ms ${persist.sys.mba_boot_timeout}
-    write /sys/module/pil_msa/parameters/modem_auth_timeout_ms ${persist.sys.modem_auth_timeout}
-    write /sys/module/peripheral_loader/parameters/proxy_timeout_ms ${persist.sys.pil_proxy_timeout}
     write /sys/kernel/boot_adsp/boot 1
 
 on boot
@@ -101,6 +150,9 @@ on boot
     chmod 2770 /dev/socket/qmux_bluetooth
     mkdir /dev/socket/qmux_gps 0770 gps gps
     chmod 2770 /dev/socket/qmux_gps
+
+    # Prevents permission denied error for telephony
+    chmod 0644 /proc/cmdline
 
     setprop wifi.interface wlan0
 
@@ -168,15 +220,27 @@ on boot
     # an ack packet comes out of order
     write /proc/sys/net/netfilter/nf_conntrack_tcp_be_liberal 1
 
-    # Set the console loglevel to < KERN_INFO
-    # Set the default message loglevel to KERN_INFO
-    write /proc/sys/kernel/printk "6 6 1 7"
-
     # Allow access for CCID command/response timeout configuration
     chown system system /sys/module/ccid_bridge/parameters/bulk_msg_timeout
 
     # When GPU woken by touch events, keep it on until first app render
     write /sys/class/kgsl/kgsl-3d0/wake_timeout 250
+
+    start rmt_storage
+
+    # Change ownership and permission for vibrator
+    chown system system /sys/class/timed_output/vibrator/enable
+    chmod 0660 /sys/class/timed_output/vibrator/enable
+    chown system system /sys/devices/virtual/timed_output/vibrator/vtg_level
+    chmod 0660 /sys/devices/virtual/timed_output/vibrator/vtg_level
+
+    # High brightness mode
+    chown system system /sys/devices/virtual/graphics/fb0/hbm
+    chmod 0660 /sys/devices/virtual/graphics/fb0/hbm
+
+    # Create directory used by display clients
+    mkdir /data/misc/display 0770 system graphics
+    mkdir /persist/display 0770 system graphics
 
 # msm specific files that need to be created on /data
 on post-fs-data
@@ -192,10 +256,6 @@ on post-fs-data
     mkdir /data/misc/ipa 0700 net_admin net_admin
 
     mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
-
-    # NFC local data and nfcee xml storage
-    mkdir /data/nfc 0770 nfc nfc
-    mkdir /data/nfc/param 0770 nfc nfc
 
     # Create the directories used by the Wireless subsystem
     mkdir /data/misc/wifi 0770 wifi wifi
@@ -223,10 +283,6 @@ on post-fs-data
 
     # Create directory used by the DASH client
     mkdir /data/misc/dash 0770 media audio
-
-    # Create directory used by display clients
-    mkdir /data/misc/display 0770 system graphics
-    mkdir /persist/display 0770 system graphics
 
     # Mounting of persist is moved to 'on emmc-fs' and 'on fs' sections
     # We chown/chmod /persist again so because mount is run as root + defaults
@@ -258,19 +314,17 @@ on post-fs-data
     mkdir /data/misc/location 0770 gps gps
     mkdir /data/misc/location/mq 0770 gps gps
     mkdir /data/misc/location/xtwifi 0770 gps gps
-    mkdir /data/misc/location/gpsone_d 0770 system gps
-    mkdir /data/misc/location/quipc 0770 gps system
     mkdir /data/misc/location/gsiff 0770 gps gps
 
-    #Create directory from IMS services
+    # Create directory from IMS services
     mkdir /data/shared 0755
     chown system system /data/shared
 
-    #Create directory for FOTA
+    # Create directory for FOTA
     mkdir /data/fota 0771
     chown system system /data/fota
 
-    #Create directory for hostapd
+    # Create directory for hostapd
     mkdir /data/hostapd 0770 system wifi
 
     # Create /data/time folder for time-services
@@ -280,41 +334,80 @@ on post-fs-data
 
     setprop vold.post_fs_data_done 1
 
-    #Create a folder for SRS to be able to create a usercfg file
+    # Create a folder for SRS to be able to create a usercfg file
     mkdir /data/data/media 0770 media media
 
-    #Create folder for mm-qcamera-daemon
+    # Create folder for mm-qcamera-daemon
     mkdir /data/camera 0770 media camera
 
-    #Create PERFD deamon related dirs
+
+    # Create PERFD deamon related dirs
     mkdir /data/misc/perfd 0755 root system
     chmod 2755 /data/misc/perfd
     mkdir /data/system/perfd 0770 root system
     chmod 2770 /data/system/perfd
 
-    # NFC local data and nfcee xml storage
-    mkdir /data/nfc 0770 nfc nfc
-    mkdir /data/nfc/param 0770 nfc nfc
+    mkdir /data/tombstones 0771 system system
+    mkdir /tombstones/modem 0771 system system
+    mkdir /tombstones/lpass 0771 system system
+    mkdir /tombstones/wcnss 0771 system system
+    mkdir /tombstones/dsps 0771 system system
+    mkdir /persist/data/sfs 0700 system system
+    mkdir /persist/data/tz 0700 system system
 
-service ssr_setup /system/bin/ssr_setup
-    oneshot
-    disabled
+    setprop ro.hw.device ${ro.boot.device}
+    setprop ro.hw.hwrev ${ro.boot.hwrev}
+    setprop ro.hw.radio ${ro.boot.radio}
 
-service ss_ramdump /system/bin/subsystem_ramdump
+on property:init.svc.surfaceflinger=stopped
+    stop ppd
+
+on property:init.svc.surfaceflinger=running
+    start ppd
+
+service wcnss-service /system/bin/wcnss_service
     class main
     user system
-    group system
-    disabled
+    group system wifi radio
 
-on property:persist.sys.ssr.restart_level=*
-    start ssr_setup
+#start camera server as daemon
+service qcamerasvr /system/bin/mm-qcamera-daemon
+    class late_start
+    user camera
+    group camera system inet input graphics
 
-on property:persist.sys.ssr.enable_ramdumps=1
-    write /sys/module/subsystem_restart/parameters/enable_ramdumps 1
-    start ss_ramdump
+# Allow usb charging to be disabled peristently
+on property:persist.usb.chgdisabled=1
+    write /sys/class/power_supply/battery/charging_enabled 0
 
-on property:persist.sys.ssr.enable_ramdumps=0
-    write /sys/module/subsystem_restart/parameters/enable_ramdumps 0
+on property:persist.usb.chgdisabled=0
+    write /sys/class/power_supply/battery/charging_enabled 1
+
+service qseecomd /system/bin/qseecomd
+   class core
+   user root
+   group root
+
+
+service perfd /system/bin/perfd
+   class main
+   user root
+   disabled
+
+service thermal-engine /system/bin/thermal-engine
+   class main
+   user root
+   group root
+
+service time_daemon /system/bin/time_daemon
+   class late_start
+   user root
+   group root
+
+service audiod /system/bin/audiod
+   class late_start
+   user system
+   group system
 
 on property:sys.boot_completed=1
     write /dev/kmsg "Boot completed "
@@ -347,7 +440,6 @@ on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
 on property:bluetooth.isEnabled=true
-    start btwlancoex
     write /sys/class/bluetooth/hci0/idle_timeout 7000
 
 on property:bluetooth.sap.status=running
@@ -361,31 +453,6 @@ on property:bluetooth.dun.status=running
 
 on property:bluetooth.dun.status=stopped
     stop bt-dun
-
-on property:ro.bluetooth.ftm_enabled=true
-    start ftmd
-
-on property:bluetooth.startbtsnoop=true
-    start btsnoop
-
-on property:bluetooth.startbtsnoop=false
-    stop btsnoop
-
-service qcom-c_core-sh /system/bin/sh /init.qcom.class_core.sh
-    class core
-    user root
-    oneshot
-
-service qcom-c_main-sh /system/bin/sh /init.class_main.sh
-    class main
-    user radio
-    group radio
-    oneshot
-
-on property:vold.decrypt=trigger_restart_framework
-    start qcom-c_main-sh
-    start config_bluetooth
-    start wcnss-service
 
 on property:persist.env.fastdorm.enabled=true
     setprop persist.radio.data_no_toggle 1
@@ -418,12 +485,6 @@ on property:wc_transport.start_hci=true
 on property:wc_transport.start_hci=false
     stop start_hci_filter
 
-service config_bluetooth /system/bin/sh /system/etc/init.qcom.bt.sh "onboot"
-    class core
-    user bluetooth
-    group bluetooth system
-    oneshot
-
 service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     class late_start
     user bluetooth
@@ -442,11 +503,9 @@ service qmuxd /system/bin/qmuxd
     class main
     user root
     group radio audio bluetooth gps qcom_diag
-    disabled
 
 service netmgrd /system/bin/netmgrd
     class main
-    disabled
 
 on property:ro.use_data_netmgrd=false
     # netmgr not supported on specific target
@@ -456,13 +515,6 @@ on property:ro.use_data_netmgrd=false
 # but only if ro.data.large_tcp_window_size property is set.
 on property:ro.data.large_tcp_window_size=true
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
-
-service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh
-    class late_start
-    user bluetooth
-    group bluetooth net_bt_admin inet net_admin net_raw
-    disabled
-    oneshot
 
 service p2p_supplicant /system/bin/wpa_supplicant \
     -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf -N \
@@ -482,16 +534,16 @@ service wpa_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -dddd \
     -I/system/etc/wifi/wpa_supplicant_overlay.conf \
     -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
-    #   we will start as root and wpa_supplicant will switch to user wifi
-    #   after setting up the capabilities required for WEXT
-    #   user wifi
-    #   group wifi inet keystore
+#   we will start as root and wpa_supplicant will switch to user wifi
+#   after setting up the capabilities required for WEXT
+#   user wifi
+#   group wifi inet keystore
     class main
     socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
 
-service dhcpcd_wlan0 /system/bin/dhcpcd
+service dhcpcd_wlan0 /system/bin/dhcpcd -ABKLG
     class late_start
     disabled
     oneshot
@@ -509,20 +561,6 @@ service iprenew_wlan0 /system/bin/dhcpcd -n
 service iprenew_p2p /system/bin/dhcpcd -n
     class late_start
     disabled
-    oneshot
-
-service ptt_ffbm /system/bin/ptt_socket_app -f -d
-    user system
-    group system
-    disabled
-    oneshot
-
-# This starts as root but later drops down to WIFI_AID just like
-#supplicant
-service wlan_logging /system/bin/ptt_socket_app -d
-    class main
-    disabled
-    group wifi log
     oneshot
 
 service dhcpcd_bt-pan /system/bin/dhcpcd -BKLG
@@ -555,42 +593,12 @@ service dhcpcd_bnep4 /system/bin/dhcpcd -BKLG
     disabled
     oneshot
 
-service loc_launcher /system/bin/loc_launcher
-    #loc_launcher will start as root and set its uid to gps
-    class late_start
-    group gps inet net_raw qcom_diag net_admin wifi
-
-service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
-    class late_start
-    user root
-    group system
-    disabled
-    oneshot
-
-on property:crypto.driver.load=1
-     insmod /system/lib/modules/qce.ko
-     insmod /system/lib/modules/qcedev.ko
-
-service qcom-sh /system/bin/sh /init.qcom.sh
-    class late_start
-    user root
-    oneshot
-
-service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
-    class late_start
-    user root
-    disabled
-    oneshot
-
-on property:sys.boot_completed=1
-    start qcom-post-boot
-
 service atfwd /system/bin/ATFWD-daemon
     class late_start
     user system
     group system radio
 
-service hostapd /system/bin/hostapd -dd /data/misc/wifi/hostapd.conf
+service hostapd /system/bin/hostapd -dd /data/hostapd/hostapd.conf
     class late_start
     user root
     group root
@@ -600,38 +608,35 @@ service hostapd /system/bin/hostapd -dd /data/misc/wifi/hostapd.conf
 on property:persist.data.ds_fmc_app.mode=1
     start ds_fmc_appd
 
+on property:ro.data.large_tcp_window_size=true
+    # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
+    write /proc/sys/net/ipv4/tcp_adv_win_scale  2
+
+service_redefine ril-daemon /system/bin/rild
+    class main
+    socket rild stream 660 root radio
+    socket rild-debug stream 660 radio system
+    socket cutback stream 660 media radio
+    user root
+    group radio cache inet misc audio sdcard_rw sensors qcom_diag log net_raw diag
+
 service ril-daemon2 /system/bin/rild -c 2
     class main
     socket rild2 stream 660 root radio
     socket rild-debug2 stream 660 radio system
     user root
     disabled
-    group radio cache inet misc audio sdcard_r sdcard_rw diag qcom_diag log
+    group radio cache inet misc audio sdcard_rw sensors qcom_diag log net_raw diag
 
-service ril-daemon3 /system/bin/rild -c 3
-    class main
-    socket rild3 stream 660 root radio
-    socket rild-debug3 stream 660 radio system
+service rild2-wrapper /system/bin/sh /system/etc/init.qcom.ril.sh
+    class late_start
     user root
-    disabled
-    group radio cache inet misc audio sdcard_r sdcard_rw diag qcom_diag log
-
-service usb_uicc_daemon /system/bin/usb_uicc_client
-    class main
-    user system
-    group system log net_raw
+    group root
     oneshot
-
-on property:sys.usb_uicc.enabled=1
-    start usb_uicc_enable
-
-on property:sys.usb_uicc.enabled=0
-    start usb_uicc_enable
 
 # virtual sdcard daemon running as media_rw (1023)
 service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
     class late_start
-    disabled
 
 service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
     class late_start
@@ -645,23 +650,97 @@ service fuse_usbotg /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d /mnt/media_rw/
     class late_start
     disabled
 
-# Binding fuse mount point to /storage/emulated/legacy
-on property:init.svc.sdcard=running
-    wait /mnt/shell/emulated/0
-    mount none /mnt/shell/emulated/0 /storage/emulated/legacy bind
+on property:init.svc.bootanim=running
+    # Switch to performance mode while booting
+    setprop sys.perf.profile 2
 
-service bms-sh /system/bin/sh /init.qcom.bms.sh
-    class main
-    user root
-    oneshot
+on property:sys.boot_completed=1
 
-service vm_bms /system/bin/vm_bms
-    user root
-    group root
-    disabled
+     write /sys/block/mmcblk0/queue/scheduler fiops
 
-service msm_irqbalance /system/bin/msm_irqbalance -f /system/vendor/etc/msm_irqbalance.conf
-    class core
-    user root
-    group root
-    disabled
+     write /sys/module/lpm_levels/parameters/sleep_disabled 0
+     write /sys/devices/system/cpu/cpu0/online 1
+
+     # HMP scheduler load tracking settings
+     write /proc/sys/kernel/sched_ravg_hist_size 3
+
+     # HMP Task packing settings for 8916
+     write /proc/sys/kernel/sched_small_task 50
+     write /proc/sys/kernel/sched_mostly_idle_load 50
+     write /proc/sys/kernel/sched_mostly_idle_nr_run 10
+
+     # disable thermal core_control to update scaling_min_freq
+     write /sys/module/msm_thermal/core_control/enabled 0
+     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 200000
+     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 200000
+     write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 200000
+     write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 200000
+     # enable thermal core_control now
+     write /sys/module/msm_thermal/core_control/enabled 1
+
+    write /sys/module/cpu_boost/parameters/boost_ms 20
+    write /sys/module/cpu_boost/parameters/sync_threshold 998400
+    write /sys/module/cpu_boost/parameters/input_boost_freq 1094400
+    write /sys/module/cpu_boost/parameters/input_boost_ms 40
+
+    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 1
+    write /sys/module/lowmemorykiller/parameters/vmpressure_file_min 49152
+
+    setprop sys.perf.profile 1
+
+# CM Performance Profiles
+# Powersave
+on property:sys.perf.profile=0
+    stop perfd
+    write /sys/devices/system/cpu/cpu1/online 1
+    write /sys/devices/system/cpu/cpu2/online 1
+    write /sys/devices/system/cpu/cpu3/online 1
+    write /sys/module/msm_thermal/core_control/enabled 0
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
+    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "powersave"
+    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "powersave"
+    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "powersave"
+    write /sys/module/msm_thermal/core_control/enabled 1
+    write /sys/class/devfreq/1c00000.qcom,kgsl-3d0/governor "powersave"
+    write /sys/class/devfreq/qcom,cpubw.30/governor "powersave"
+    start perfd
+
+# Balanced
+on property:sys.perf.profile=1
+    stop perfd
+    write /sys/devices/system/cpu/cpu1/online 1
+    write /sys/devices/system/cpu/cpu2/online 1
+    write /sys/devices/system/cpu/cpu3/online 1
+    write /sys/module/msm_thermal/core_control/enabled 0
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "interactive"
+    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "interactive"
+    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "interactive"
+    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "interactive"
+    write /sys/module/msm_thermal/core_control/enabled 1
+
+    write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 20000
+    write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 60000
+    write /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq 998400
+    write /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load 80
+    write /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay 20000
+    write /sys/devices/system/cpu/cpufreq/interactive/boostpulse_duration 60000
+    write /sys/devices/system/cpu/cpufreq/interactive/target_loads 80
+
+    write /sys/class/devfreq/1c00000.qcom,kgsl-3d0/governor "msm-adreno-tz"
+    write /sys/class/devfreq/qcom,cpubw.30/governor "cpufreq"
+    start perfd
+
+# High performance
+on property:sys.perf.profile=2
+    stop perfd
+    write /sys/devices/system/cpu/cpu1/online 1
+    write /sys/devices/system/cpu/cpu2/online 1
+    write /sys/devices/system/cpu/cpu3/online 1
+    write /sys/module/msm_thermal/core_control/enabled 0
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "performance"
+    write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "performance"
+    write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "performance"
+    write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "performance"
+    write /sys/module/msm_thermal/core_control/enabled 1
+    write /sys/class/devfreq/1c00000.qcom,kgsl-3d0/governor "performance"
+    write /sys/class/devfreq/qcom,cpubw.30/governor "performance"
