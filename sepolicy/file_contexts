@@ -1,5 +1,5 @@
 # Binaries
-/system/bin/akmd09912                                       u:object_r:akmd_exec:s0
+/system/bin/akmd09912                                       u:object_r:akmd09912_exec:s0
 /system/bin/batt_health                                     u:object_r:batt_health_exec:s0
 /system/bin/dbvc_atvc_property_set                          u:object_r:atvc_exec:s0
 /system/bin/stml0xx_wrapper.sh                              u:object_r:stml0xx_exec:s0

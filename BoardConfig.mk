@@ -173,7 +173,7 @@ BOARD_SEPOLICY_DIRS += \
     device/motorola/lux/sepolicy
 
 BOARD_SEPOLICY_UNION += \
-    akmd.te \
+    akmd09912.te \
     atfwd.te \
     atvc.te \
     batt_health.te \
