@@ -2,7 +2,7 @@
 allow init app_data_file:dir setattr;
 allow init cid_block_device:blk_file setattr;
 allow init clogo_block_device:blk_file setattr;
-allow init modem_hob_block_device:blk_file setattr;
+allow init hob_block_device:blk_file setattr;
 allow init utags_block_device:blk_file setattr;
 allow init kpan_block_device:blk_file setattr;
 
