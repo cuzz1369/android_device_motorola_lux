@@ -41,7 +41,7 @@ LOCAL_CFLAGS += \
 LOCAL_C_INCLUDES:= \
     $(TARGET_OUT_HEADERS)/gps.utils \
     $(TARGET_OUT_HEADERS)/libloc_core \
-    device/motorola/lux/gps/libloc_api_50001
+    $(LOCAL_DIR)
 
 LOCAL_COPY_HEADERS_TO:= libloc_eng/
 LOCAL_COPY_HEADERS:= \
@@ -112,7 +112,7 @@ endif
 endif
 
 LOCAL_PRELINK_MODULE := false
-LOCAL_MODULE_RELATIVE_PATH := hw
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
 include $(BUILD_SHARED_LIBRARY)
 

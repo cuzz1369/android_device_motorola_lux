@@ -40,7 +40,6 @@ TARGET_NO_BOOTLOADER := true
 
 # Properties
 TARGET_SYSTEM_PROP += device/motorola/lux/system.prop
-
 TARGET_SPECIFIC_HEADER_PATH := device/motorola/lux/include
 
 # Kernel
@@ -51,14 +50,13 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100 # For CAF
 BOARD_RAMDISK_OFFSET     := 0x01000000 # For CAF
-BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --tags_offset 0x00000100 # TODO: Need to be check on stock firmware
+BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 TARGET_KERNEL_SOURCE := kernel/motorola/msm8939
 TARGET_KERNEL_CONFIG := lux_defconfig
 
 # Audio
 AUDIO_FEATURE_ENABLED_NEW_SAMPLE_RATE := true
 AUDIO_FEATURE_ENABLED_KPI_OPTIMIZE := true
-#AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 BOARD_USES_ALSA_AUDIO := true
 AUDIO_FEATURE_ENABLED_MULTI_VOICE_SESSIONS := true
 TARGET_USES_QCOM_MM_AUDIO := true
@@ -80,9 +78,6 @@ BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
 USE_CAMERA_STUB := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
-# CNE
-TARGET_LDPRELOAD := libNimsWrap.so
-
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := true
 
@@ -91,8 +86,6 @@ BOARD_USES_CYANOGEN_HARDWARE := true
 BOARD_HARDWARE_CLASS += hardware/cyanogen
 
 # Display
-#TODO: Fix-me: Setting TARGET_HAVE_HDMI_OUT to false
-# to get rid of compilation error.
 TARGET_HAVE_HDMI_OUT := false
 TARGET_HARDWARE_3D := false
 TARGET_USES_OVERLAY := true
@@ -131,7 +124,6 @@ TARGET_PROVIDES_GPS_LOC_API := true
 TARGET_UNIFIED_DEVICE := true
 TARGET_INIT_VENDOR_LIB := libinit_msm
 TARGET_LIBINIT_DEFINES_FILE := device/motorola/lux/init/init_lux.c
-#TARGET_PLATFORM_DEVICE_BASE := /devices/soc.0/
 
 # Malloc
 MALLOC_IMPL := dlmalloc
@@ -146,13 +138,8 @@ BOARD_NFC_HAL_SUFFIX := 8916
 TARGET_POWERHAL_VARIANT := qcom
 
 # Qualcomm support
-#BOARD_USES_QC_TIME_SERVICES := true
-ifneq ($(QCPATH),)
-BOARD_USES_QCNE := true
-endif
 BOARD_USES_QCOM_HARDWARE := true
 TARGET_USES_QCOM_BSP := true
-TARGET_HW_DISK_ENCRYPTION := true
 
 # Recovery
 TARGET_RECOVERY_FSTAB := device/motorola/lux/ramdisk/fstab.qcom
@@ -204,7 +191,7 @@ HAVE_SYNAPTICS_I2C_RMI4_FW_UPGRADE := true
 # Vold
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
 
-# Wifi - Classic prima with driver in-built
+# Wifi
 BOARD_HAS_QCOM_WLAN := true
 BOARD_HAS_QCOM_WLAN_SDK := true
 BOARD_HOSTAPD_DRIVER := NL80211

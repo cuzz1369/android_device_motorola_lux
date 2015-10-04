@@ -1,4 +1,3 @@
--app/MotGeoFenceSvc/MotGeoFenceSvc.apk
 -app/TimeService/TimeService.apk
 -priv-app/com.qualcomm.location/com.qualcomm.location.apk
 -app/qcrilmsgtunnel/qcrilmsgtunnel.apk
@@ -13,6 +12,7 @@ bin/batt_health
 bin/btnvtool
 bin/charge_only_mode
 bin/dbvc_atvc_property_set
+bin/hardware_revisions.sh
 bin/hci_qcomm_init
 bin/irsc_util
 bin/loc_launcher
@@ -20,6 +20,7 @@ bin/location-mq
 bin/mm-pp-daemon
 bin/mm-qcamera-app
 bin/mm-qcamera-daemon
+bin/msm_irqbalance
 bin/netmgrd
 bin/perfd
 bin/qmi_motext_hook
@@ -126,6 +127,8 @@ lib/libchromatix_imx135_liveshot.so
 lib/libdrmdecrypt.so
 lib/libjscore.so
 lib/libjustshoot.so
+lib/libloc_api_v02.so
+lib/libloc_ds_api.so
 lib/libmdmcutback.so
 lib/libmm-qcamera.so
 lib/libmmcamera_interface.so
@@ -567,5 +570,3 @@ vendor/lib/qcdrm/playready/lib/mediadrm/libprmediadrmplugin_customer.so
 vendor/lib/soundfx/libqcbassboost.so
 vendor/lib/soundfx/libqcreverb.so
 vendor/lib/soundfx/libqcvirt.so
-vendor/media/LMspeed_508.emd
-vendor/media/PFFprec_600.emd

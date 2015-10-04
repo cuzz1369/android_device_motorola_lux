@@ -14,8 +14,7 @@
 # limitations under the License.
 #
 
+LOCAL_PATH := $(call my-dir)
 
-LOC_PATH := $(call my-dir)
-
-include $(call first-makefiles-under,$(LOC_PATH))
+include $(call all-subdir-makefiles,$(LOCAL_PATH))
 

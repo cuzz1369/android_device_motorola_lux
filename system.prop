@@ -68,7 +68,8 @@ mm.enable.smoothstreaming=true
 mmp.enable.3g2=true
 media.aac_51_output_enabled=true
 #codecs: DivX DivXHD AVI AC3 ASF AAC QCP DTS 3G2 MP2TS FLAC
-mm.enable.qcom_parser=3314291
+mm.disable.sec_smoothstreaming=true
+mm.enable.qcom_parser=3179041
 
 # Default to AwesomePlayer
 media.stagefright.use-awesome=false
@@ -114,7 +115,7 @@ ro.qc.sdk.audio.fluencetype=fluence
 persist.audio.fluence.voicecall=true
 persist.audio.fluence.voicerec=false
 persist.audio.fluence.audiorec=false
-persist.audio.fluence.speaker=false
+persist.audio.fluence.speaker=true
 persist.audio.fluence.mode=endfire
 ro.config.vc_call_vol_steps=7
 # Tone generator maximum volume be between 0 and 100 (0dB)
@@ -123,12 +124,11 @@ ro.audio.ringbeep_volume=73
 audio.offload.buffer.size.kb=240
 #Minimum duration for offload playback in secs
 audio.offload.min.duration.secs=30
-# Motorola enable offload audio playback
-audio.offload.disable=0
 #Enable offload audio video playback by default
 av.offload.enable=true
 #enable voice path for PCM VoIP by default
-use.voice.path.for.pcm.voip=false
+tunnel.audio.encode=false
+use.voice.path.for.pcm.voip=true
 #
 #System property for FM transmitter
 #
@@ -170,7 +170,7 @@ ro.sys.fw.bservice_age=5000
 ro.vendor.extension_library=libqti-perfd-client.so
 persist.radio.apm_sim_not_pwdn=1
 persist.radio.sib16_support=1
-ro.frp.pst=/dev/block/bootdevice/by-name/config
+ro.frp.pst=/dev/block/bootdevice/by-name/frp
 
 #
 # system.prop for lux
@@ -199,7 +199,6 @@ persist.radio.msgtunnel.start=true
 persist.radio.oem_ind_to_both=false
 ro.data.large_tcp_window_size=true
 persist.radio.apn_delay=5000
-keyguard.no_require_sim=true
 
 # Sdcard
 persist.fuse_sdcard=false
@@ -207,11 +206,15 @@ persist.esdfs_sdcard=true
 ro.crypto.fuse_sdcard=true
 
 # GPS
+persist.gps.qc_nlp_in_use=1
+persist.loc.nlp_name=com.qualcomm.services.location
 persist.mot.gps.conf.from.sim=true
 persist.mot.gps.smart_battery=1
 persist.gps.qc_nlp_in_use=0
 ro.gps.agps_provider=1
 ro.pip.gated=0
+ro.qc.sdk.izat.premium_enabled=1
+ro.qc.sdk.izat.service_mask=0x5
 
 # CPU
 ro.cpu0.cpu_max_freq=10485760
@@ -248,12 +251,15 @@ persist.sys.media.use-awesome=false
 audio.offload.disable=0
 audio.offload.pcm.16bit.enable=false
 audio.offload.pcm.24bit.enable=false
-audio.offload.gapless.enabled=false
 av.offload.enable=false
+av.streaming.offload.enable=true
 mm.enable.qcom_parser=4643
 drm.service.enabled=true
 
 # Misc
 mdc_initial_max_retry=10
 ro.partial.display=false
-
+com.qc.hardware=true
+nfc.bcm2079x.isSecure=1
+persist.camera.video.hdr=record
+persist.sys.isUsbOtgEnabled=true
