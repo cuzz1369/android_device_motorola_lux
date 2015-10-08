@@ -143,9 +143,9 @@
     </string-array>
 
     <!-- Do not translate. Defines the slots is Two Digit Number for dialing normally not USSD -->
-    <string-array translatable="false"  name="config_twoDigitNumberPattern">
+    <!-- <string-array translatable="false"  name="config_twoDigitNumberPattern">
         <item>08</item>
-    </string-array>
+    </string-array> -->
 
     <!-- Is the device capable of hot swapping an UICC Card -->
     <bool translatable="false" name="config_hotswapCapable">false</bool>
@@ -204,7 +204,7 @@
          rat-name:rmem_min,rmem_def,rmem_max,wmem_min,wmem_def,wmem_max
          If no value is found for the rat-name in use, the system default will be applied.
     -->
-    <string-array translatable="false"  name="config_mobile_tcp_buffers">
+    <!-- <string-array translatable="false"  name="config_mobile_tcp_buffers">
         <item>umts:131072,262144,1452032,4096,16384,399360</item>
         <item>hspa:131072,262144,2441216,4096,16384,399360</item>
         <item>hsupa:131072,262144,2441216,4096,16384,399360</item>
@@ -215,7 +215,7 @@
         <item>1xrtt:16384,32768,131070,4096,16384,102400</item>
         <item>evdo:131072,262144,1048576,4096,16384,524288</item>
         <item>lte:524288,1048576,8388608,262144,524288,4194304</item>
-    </string-array>
+    </string-array> -->
 
     <!-- If EMS is not supported, framework breaks down EMS into single segment SMS
          and adds page info " x/y". This config is used to set which carrier doesn't
@@ -224,14 +224,14 @@
          And use gid to distinguish different carriers which using same mcc and mnc.
          Examples: <item>simOperatorNumber;position;gid(optional)</item>>
     -->
-    <string-array translatable="false"  name="no_ems_support_sim_operators">
+    <!-- <string-array translatable="false"  name="no_ems_support_sim_operators">
         <item>20404;suffix;BAE0000000000000</item>
         <item>316010;prefix</item>
         <item>31122;prefix</item>
         <item>31158;prefix</item>
         <item>310120;prefix</item>
         <item>311870;prefix</item>
-    </string-array>
+    </string-array> -->
 
     <!-- This string array should be overridden by the device to present a list of radio
          attributes.  This is used by the connectivity manager to decide which networks can coexist
@@ -249,6 +249,7 @@
                   USB interfaces.  If the device doesn't want to support tething over USB this should
          be empty.  An example would be "usb.*" -->
     <string-array translatable="false" name="config_tether_usb_regexs">
+        <item>"usb\\d"</item>
         <item>"rndis\\d"</item>
     </string-array>
 
