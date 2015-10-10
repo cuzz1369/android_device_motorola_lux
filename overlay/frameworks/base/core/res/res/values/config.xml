@@ -84,46 +84,6 @@
         <item>256</item>
     </integer-array>
 
-    <!-- Vibrator pattern for feedback about a long screen/key press -->
-    <integer-array translatable="false" name="config_longPressVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>105</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about touching a virtual key -->
-    <integer-array translatable="false" name="config_virtualKeyVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>24</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for a very short but reliable vibration for soft keyboard tap -->
-    <integer-array translatable="false" name="config_keyboardTapVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>5</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about booting with safe mode disabled -->
-    <integer-array translatable="false" name="config_safeModeDisabledVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>117</item>
-    </integer-array>
-    <integer-array translatable="false" name="config_safeModeEnabledVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>94</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about booting with safe mode disabled -->
-    <integer-array translatable="false" name="config_scrollBarrierVibePattern">
-        <item>0</item>
-        <item>0</item>
-        <item>15</item>
-    </integer-array>
-
     <!-- Package name(s) containing location provider support.
          These packages can contain services implementing location providers,
          such as the Geocode Provider, Network Location Provider, and
