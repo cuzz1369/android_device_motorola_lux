@@ -96,7 +96,6 @@ etc/firmware/venus.mbn
 etc/firmware/venus.mdt
 etc/firmware/vrgain.bin
 etc/flp.conf
-etc/gps.conf
 etc/hdcp_8939.dat.enc
 etc/izat.conf
 etc/libnfc-brcm.conf
