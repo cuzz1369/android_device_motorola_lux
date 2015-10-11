@@ -125,6 +125,9 @@ TARGET_UNIFIED_DEVICE := true
 TARGET_INIT_VENDOR_LIB := libinit_msm
 TARGET_LIBINIT_DEFINES_FILE := device/motorola/lux/init/init_lux.c
 
+# Lights
+TARGET_PROVIDES_LIBLIGHT := true
+
 # Malloc
 MALLOC_IMPL := dlmalloc
 
